@@ -1,24 +1,20 @@
 module Utilities
 	
-	def evaluate(x)
-		if x % 100 == 0
-			if x % 400 == 0
-				true
-			else
-				false
-			end
-		elsif x % 4 == 0
-			true
-		else
-			false
-		end
+	def leap_year?(year)
+		(year % 100 == 0 && year % 400 == 0) || (year % 4 == 0 && !(year % 100 == 0))
 	end
 
-	def amount(a)
-		('%.1f' % ((a / 31536000.0) * 100)) + '%'
+#----------------------------------------------------------#
+
+	def percent_of_year(percent)
+		('%.1f' % (percent*10000 / SECONDS_IN_YEAR)) + '%'
 	end
 
-	def convert(x)
+	SECONDS_IN_YEAR = 31536000.0
+
+#----------------------------------------------------------#
+
+	def convert_clock_to_military(x)
 		a, b = x.split(":")
 		c, d = b.split(" ")
 		e = ""
@@ -31,7 +27,7 @@ module Utilities
 			end
 		elsif d.downcase != 'pm'
 			if a.to_i == 12
-				e = (a.to_i - 12).to_s + ":" + c
+				e = (a.to_i - 12).to_s + ":" + c || e = a + ":" + c
 			else
 				e = a + ":" + c
 			end
@@ -40,41 +36,32 @@ module Utilities
 		return e
 	end
 
-	def convert2(x)
+# -------------------------------------------------------------#
+
+	def convert_military_to_normal(x)
 		a, b = x.split(":")
 		c = ""
-
 		if a.to_i < 12
-			c = a + b + " am"
-		else
-			c = a + b + " pm"
+			c = a + b + " am" || c = a + b + " pm"
 		end
-
-		return c
 	end
 
-	def okay(a, b)
-		c = false
-		if (a.split(":")[0].to_i >= 8 && b || a.split(":")[0].to_i >= 10 && !b) && a.split(":")[1].split(" ")[1] == 'pm'
-			c = false
-		else
-			c = true
-		end
-		return c
+# -------------------------------------------------------------#
+
+
+	def bedtime?(time, bool)
+		hours = time.split(":")[0].to_i
+		am_or_pm = time.split(":")[1].split(" ")[1]
+
+		(hours >= 8 && bool || hours >= 10 && !bool) && am_or_pm == 'PM' ? false : true
 	end
 
-	def span(a, b)
-		c = 0
-		d = 0
-		if a < b
-			c = b
-			d = a
-		else
-			c = a
-			d = b
-		end
+# ------------------------------------------------------------# 
 
-		return ('%.1f' % (amount(c)[0..-2].to_f - amount(d)[0..-2].to_f)).to_s + '%'
+	def difference_in_percentages(num1_secs1, num_secs2)
+		year_percent1 = percent_of_year(num1_secs1)[0..-2].to_f
+		year_percent2 = percent_of_year(num1_secs2)[0..-2].to_f
+		num_secs1 < num_secs2 ? total_percent(year_percent2,year_percent1) : total_percent(year_percent1, year_percent2)
 	end
 
 end
